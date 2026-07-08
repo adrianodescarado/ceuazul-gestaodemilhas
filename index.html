@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Céu Azul Milhas — Diagnóstico Gratuito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d1a; --bg2:#0c1120; --card:#121830; --card-line:rgba(255,255,255,0.08);
+    --blue:#3b6fe0; --blue-deep:#1e3fa8; --blue-light:#6d93ef; --blue-text:#7fa0f0;
+    --gold:#f2b73f; --gold-light:#ffd579;
+    --white:#f4f6fb; --muted:#8d97b8; --green:#22c55e; --green-dark:#16a34a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--white); font-family:'Inter',sans-serif;
+    overflow:hidden; height:100vh; height:100dvh; position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:'Playfair Display', serif;}
+  a{color:inherit; text-decoration:none;}
+
+  /* STARFIELD */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(3px 3px at 10% 20%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(3px 3px at 80% 10%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2.5px 2.5px at 30% 70%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(3px 3px at 60% 85%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(2.5px 2.5px at 90% 60%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(3px 3px at 45% 40%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(2.5px 2.5px at 20% 90%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(3px 3px at 70% 30%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(2px 2px at 15% 45%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2.5px 2.5px at 55% 15%, rgba(255,255,255,0.28), transparent),
+      radial-gradient(2px 2px at 85% 80%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2.5px 2.5px at 35% 95%, rgba(255,255,255,0.25), transparent);
+    background-size:100% 100%;
+  }
+
+  /* TOPBAR */
+  .topbar{
+    position:relative; z-index:5; padding:14px 20px 10px;
+  }
+  .progress-track{height:3px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; margin-bottom:10px;}
+  .progress-fill{height:100%; width:11%; background:linear-gradient(90deg,var(--blue),var(--gold)); transition:width .5s ease;}
+  .topbar-row{display:flex; align-items:center; justify-content:space-between;}
+  .step-tag{font-size:11px; color:var(--muted); letter-spacing:.05em;}
+
+  /* SCREENS */
+  .viewport{position:relative; z-index:2; height:calc(100vh - 44px); height:calc(100dvh - 44px); overflow:hidden;}
+  .screens{display:flex; height:100%; width:100%; transition:transform .5s cubic-bezier(.65,0,.35,1);}
+  .screen{
+    flex:0 0 100%; max-width:100%; height:100%; overflow-y:auto;
+    padding:20px 22px 40px; -webkit-overflow-scrolling:touch;
+  }
+  .screen-inner{max-width:460px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; justify-content:center;}
+  .screen-inner.top-align{justify-content:flex-start; padding-top:6px;}
+
+  /* LOGO / HERO */
+  .logo-row{display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:26px;}
+  .logo-icon{
+    width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
+    display:flex; align-items:center; justify-content:center; font-size:23px;
+  }
+  .logo-text{font-size:24px; font-weight:800;}
+  .logo-text .azul{color:var(--blue-light);}
+
+  .badge{
+    display:block; margin:0 auto 30px; width:fit-content;
+    border:1px solid rgba(109,147,239,0.4); color:var(--blue-text);
+    font-size:14.5px; font-weight:600; padding:10px 20px; border-radius:24px;
+    background:rgba(59,111,224,0.08);
+  }
+
+  .plane{
+    font-size:88px; text-align:center; margin-bottom:22px;
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1); opacity:1;}
+    50%{transform:scale(1.12); opacity:0.85;}
+  }
+
+  h1.hero-h{
+    font-size:clamp(36px,10vw,52px); font-weight:900; text-align:center; line-height:1.15;
+    margin-bottom:20px; letter-spacing:-0.01em;
+  }
+  h1.hero-h .gold{color:var(--gold);}
+  p.lead{color:var(--muted); font-size:17px; text-align:center; margin-bottom:28px; line-height:1.65;}
+
+  .btn-cta{
+    display:block; width:100%; text-align:center; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
+    color:#fff; font-weight:800; font-size:16px; padding:18px; border-radius:40px; border:none; cursor:pointer;
+    box-shadow:0 10px 28px rgba(59,111,224,0.35); font-family:inherit;
+  }
+  .btn-cta:active{transform:scale(0.98);}
+
+  .stats-row{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:32px;}
+  .stat{text-align:center;}
+  .stat b{display:block; font-family:'Playfair Display',serif; font-size:27px; color:var(--gold); font-weight:800;}
+  .stat span{font-size:11.5px; color:var(--muted); line-height:1.3; display:block; margin-top:3px;}
+
+  /* EYEBROW / HEADINGS */
+  .eyebrow{font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue-text); margin-bottom:12px;}
+  h2.q-h{font-family:'Playfair Display',serif; font-size:clamp(24px,6vw,32px); font-weight:800; line-height:1.2; margin-bottom:8px;}
+  h2.q-h .gold{color:var(--gold);}
+  p.sub{color:var(--muted); font-size:14px; margin-bottom:24px;}
+
+  /* CALCULATOR CARD */
+  .calc-card{background:var(--card); border:1px solid var(--card-line); border-radius:16px; padding:22px; margin-bottom:16px;}
+  .slider-label{font-size:14px; color:var(--muted); margin-bottom:10px;}
+  .slider-label b{color:var(--blue-light);}
+  .big-num{font-family:'Playfair Display',serif; font-size:34px; font-weight:800; margin-bottom:16px;}
+  .big-num span{color:var(--gold); font-size:16px; font-weight:600; margin-left:6px;}
+  input[type=range]{
+    width:100%; -webkit-appearance:none; height:6px; border-radius:4px; background:rgba(255,255,255,0.1); outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+    background:var(--blue-light); cursor:pointer; border:3px solid var(--bg);
+    box-shadow:0 0 0 3px var(--blue-light);
+  }
+
+  .opt-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;}
+  .opt-btn{
+    background:var(--card); border:1.5px solid var(--card-line); border-radius:12px;
+    padding:18px 10px; text-align:center; font-size:14.5px; font-weight:600; color:var(--white);
+    cursor:pointer; font-family:inherit;
+  }
+  .opt-btn .ic{display:block; font-size:22px; margin-bottom:6px;}
+  .opt-btn.selected{border-color:var(--blue-light); background:rgba(59,111,224,0.15);}
+
+  /* RESULTADO */
+  .result-box{
+    background:linear-gradient(160deg, rgba(59,111,224,0.25), rgba(30,63,168,0.35));
+    border:1px solid rgba(109,147,239,0.3); border-radius:16px; padding:26px 22px; text-align:center; margin-bottom:16px;
+  }
+  .result-box .lbl{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--blue-text); margin-bottom:8px;}
+  .result-box .fig{font-family:'Playfair Display',serif; font-size:42px; font-weight:900; color:var(--gold); margin-bottom:8px;}
+  .result-box .note{font-size:13px; color:#c7d4f5;}
+  .result-box .note b{color:#fff;}
+
+  .grid4{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
+  .mini{background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:16px 10px; text-align:center;}
+  .mini b{display:block; font-family:'Playfair Display',serif; font-size:21px; font-weight:800;}
+  .mini b.green{color:var(--green);}
+  .mini span{font-size:10.5px; color:var(--muted); display:block; margin-top:3px;}
+
+  .alert-box{
+    background:rgba(242,183,63,0.08); border:1px solid rgba(242,183,63,0.35); border-radius:12px;
+    padding:14px 16px; font-size:13px; color:var(--gold-light); margin-bottom:20px; line-height:1.5;
+  }
+  .alert-box b{color:var(--gold);}
+
+  .x-list, .check-list{margin-bottom:8px;}
+  .x-row, .check-row{
+    display:flex; gap:10px; align-items:flex-start; padding:11px 0;
+    border-top:1px solid var(--card-line); font-size:13.8px; color:#dbe3f7;
+  }
+  .x-row:last-child, .check-row:last-child{border-bottom:1px solid var(--card-line);}
+  .x-row span.mark{color:#e0574f; font-weight:800; flex-shrink:0;}
+  .check-row span.mark{color:var(--blue-light); font-weight:800; flex-shrink:0;}
+
+  .stat-card{background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:14px 10px; text-align:center;}
+  .stat-card b{display:block; font-family:'Playfair Display',serif; font-size:17px; color:var(--gold); font-weight:800;}
+  .stat-card span{font-size:9.5px; color:var(--muted);}
+
+  /* CASOS */
+  .caso-card{
+    background:var(--card); border:1px solid var(--card-line); border-radius:16px; padding:20px;
+    margin-bottom:14px; position:relative; overflow:hidden;
+  }
+  .caso-card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,var(--blue-light),var(--gold));
+  }
+  .caso-top{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
+  .caso-icon{
+    width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
+    display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+  }
+  .caso-top h3{font-size:15.5px; font-weight:700;}
+  .caso-top span{font-size:12px; color:var(--muted);}
+  .caso-stats-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;}
+  .caso-stats-row div{background:rgba(255,255,255,0.04); border-radius:10px; padding:10px 4px; text-align:center;}
+  .caso-stats-row b{display:block; font-family:'Playfair Display',serif; color:var(--gold); font-size:16px; font-weight:800;}
+  .caso-stats-row span{font-size:9.5px; color:var(--muted);}
+  .caso-quote{
+    border-left:2px solid var(--blue-light); padding-left:12px; font-size:13.5px; color:#dbe3f7; font-style:italic; line-height:1.5;
+  }
+
+  /* PROCESSO */
+  .proc-item{display:flex; gap:14px; margin-bottom:20px;}
+  .proc-num{
+    width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; flex-shrink:0;
+  }
+  .proc-item h3{font-size:15.5px; font-weight:700; margin-bottom:4px;}
+  .proc-item p{font-size:13.5px; color:var(--muted); line-height:1.5;}
+  .divider{height:1px; background:var(--card-line); margin:8px 0 22px;}
+
+  /* PLANOS */
+  .plano-card{
+    background:var(--card); border:1.5px solid var(--card-line); border-radius:16px; padding:20px; margin-bottom:14px;
+    cursor:pointer; transition:border-color .15s;
+  }
+  .plano-card.selected, .plano-card.pop{
+    border-color:var(--blue-light); background:linear-gradient(160deg, rgba(59,111,224,0.15), rgba(18,24,48,1));
+  }
+  .plano-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .plano-head .name{display:flex; align-items:center; gap:8px; font-size:17px; font-weight:800;}
+  .tag-pop{
+    background:linear-gradient(90deg,var(--blue-light),var(--blue-deep)); color:#fff; font-size:10px; font-weight:700;
+    padding:3px 10px; border-radius:20px; letter-spacing:.02em;
+  }
+  .plano-price{font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); font-weight:800;}
+  .plano-desc{font-size:12.5px; color:var(--muted); margin-bottom:10px;}
+  .plano-feats{font-size:12.5px; color:#d5dcf0; line-height:1.9;}
+  .plano-feats div{display:flex; gap:8px;}
+  .plano-feats div::before{content:"✓"; color:var(--blue-light); font-weight:800;}
+
+  /* CTA FINAL */
+  .lock-note{text-align:center; font-size:12px; color:var(--muted); margin-top:16px;}
+  .footer-note{text-align:center; font-size:11.5px; color:var(--muted); margin-top:26px;}
+  .footer-note .partner{color:var(--blue-text); font-weight:600; margin-top:4px;}
+  .btn-ghost-full{
+    display:block; width:100%; text-align:center; background:transparent; border:1px solid var(--card-line);
+    color:var(--muted); font-size:13.5px; font-weight:600; padding:14px; border-radius:40px; margin-top:12px;
+    cursor:pointer; font-family:inherit;
+  }
+  .btn-whatsapp{
+    display:flex; align-items:center; justify-content:center; gap:9px; width:100%;
+    background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#fff; font-weight:800; font-size:16px;
+    padding:18px; border-radius:40px; box-shadow:0 10px 28px rgba(34,197,94,0.35);
+  }
+
+  ::-webkit-scrollbar{width:0px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="topbar-row"><div class="step-tag" id="stepTag">Passo 1 de 6</div></div>
+</div>
+
+<div class="viewport">
+  <div class="screens" id="screens">
+
+    <!-- SCREEN 1: HERO -->
+    <div class="screen">
+      <div class="screen-inner">
+        <div class="logo-row">
+          <div class="logo-icon">✈️</div>
+          <div class="logo-text serif"><span>Céu</span> <span class="azul">Azul</span> Milhas</div>
+        </div>
+        <span class="badge">✦ Exclusivo para viajantes frequentes</span>
+        <div class="plane">✈️</div>
+        <h1 class="hero-h serif">Você está deixando <span class="gold">dinheiro no ar</span></h1>
+        <p class="lead">Quem gasta R$20k+ no cartão todo mês poderia estar viajando de graça. Descubra quanto você está perdendo agora.</p>
+        <button class="btn-cta" onclick="goTo(1)">Calcular minha perda — grátis →</button>
+        <div class="stats-row">
+          <div class="stat"><b>+200</b><span>clientes ativos</span></div>
+          <div class="stat"><b>R$2M+</b><span>economizados em passagens</span></div>
+          <div class="stat"><b>98%</b><span>satisfação garantida</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: CALCULADORA -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Passo 1 de 2 · Calculadora</div>
+        <h2 class="q-h serif">Quanto você gasta por mês no cartão?</h2>
+        <p class="sub">Some todos os seus cartões de crédito</p>
+
+        <div class="calc-card">
+          <div class="slider-label">Gasto mensal no cartão: <b id="gastoInline">R$ 20.000</b></div>
+          <div class="big-num" id="gastoBig">R$ 20.000<span>/ mês</span></div>
+          <input type="range" id="gastoSlider" min="1000" max="50000" step="500" value="20000">
+        </div>
+
+        <div class="calc-card">
+          <div class="slider-label" style="margin-bottom:14px;">Viagens internacionais por ano:</div>
+          <div class="opt-grid" id="opts-viagens">
+            <button class="opt-btn" data-val="1"><span class="ic">🌎</span>1 viagem</button>
+            <button class="opt-btn selected" data-val="2"><span class="ic">🌍</span>2 viagens</button>
+            <button class="opt-btn" data-val="3.5"><span class="ic">🌏</span>3–4 viagens</button>
+            <button class="opt-btn" data-val="6"><span class="ic">🚀</span>5+ viagens</button>
+          </div>
+        </div>
+
+        <button class="btn-cta" onclick="calcular()">Calcular minha economia →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: RESULTADO -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Resultado · Seu diagnóstico</div>
+        <h2 class="q-h serif">Aqui está quanto você <span class="gold">está perdendo</span></h2>
+
+        <div class="result-box">
+          <div class="lbl">Perda anual estimada</div>
+          <div class="fig" id="resPerda">R$ 0</div>
+          <div class="note">em passagens que você poderia ter <b>de graça</b></div>
+        </div>
+
+        <div class="grid4">
+          <div class="mini"><b id="resMes">0</b><span>milhas acumuladas por mês</span></div>
+          <div class="mini"><b id="resAno">0</b><span>milhas acumuladas por ano</span></div>
+          <div class="mini"><b class="green" id="resEconomia">R$ 0</b><span>economia líquida plano Gold</span></div>
+          <div class="mini"><b id="resRoi">0x</b><span>retorno sobre o investimento</span></div>
+        </div>
+
+        <div class="alert-box">⚡ <b>Atenção:</b> milhas expiram e não voltam. Um exemplo real: transferir 400 mil pontos de banco sem bônus já representa perder entre R$6.000 e R$10.000.</div>
+
+        <button class="btn-cta" onclick="goTo(3)">Entender o valor real das milhas →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: MILHAS É DINHEIRO -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Porque: milhas é igual a dinheiro</div>
+        <h2 class="q-h serif">Milhas são uma <span class="gold">moeda de verdade</span></h2>
+        <p class="sub">Hoje as milhas podem ser convertidas em reais (R$), avaliadas entre R$10,00 e R$90,00 cada mil milhas. E você sabia que cada companhia aérea avalia isso de forma diferente?</p>
+
+        <div class="grid4" style="grid-template-columns:1fr 1fr; margin-bottom:20px;">
+          <div class="mini"><b>R$1.780</b><span>100 mil milhas Smiles</span></div>
+          <div class="mini"><b>R$2.850</b><span>100 mil milhas Latam</span></div>
+        </div>
+
+        <div class="alert-box" style="text-align:center;">💰 <b>Quanta diferença, né?</b></div>
+
+        <button class="btn-cta" onclick="goTo(4)">Ver exemplo real de perda →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: EXEMPLO + PRINCIPAIS ERROS -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Exemplo real</div>
+        <h2 class="q-h serif">Uma transferência mal feita <span class="gold">custa caro</span></h2>
+        <div class="calc-card">
+          <p style="font-size:14px; color:#dbe3f7; line-height:1.7;">Se você possui <b style="color:var(--gold);">400 mil pontos</b> em um programa de banco e transfere sem bônus para o programa de milhas da cia aérea, você está perdendo entre <b style="color:var(--gold);">R$6.000,00 e R$10.000,00</b>.</p>
+        </div>
+
+        <div class="eyebrow" style="margin-top:24px;">Principais erros</div>
+        <div class="x-list">
+          <div class="x-row"><span class="mark">✕</span>Usar cartões que não pontuam</div>
+          <div class="x-row"><span class="mark">✕</span>Deixar pontos ou milhas expirarem</div>
+          <div class="x-row"><span class="mark">✕</span>Trocar pontos ou milhas por produtos</div>
+          <div class="x-row"><span class="mark">✕</span>Vender milhas por um valor muito abaixo do mercado</div>
+          <div class="x-row"><span class="mark">✕</span>Comprar produtos pela internet sem pontuar com isso</div>
+          <div class="x-row"><span class="mark">✕</span>Reservar carros ou hotéis sem pontuar/economizar com isso</div>
+        </div>
+
+        <button class="btn-cta" style="margin-top:22px;" onclick="goTo(5)">Ver o que fazemos por você →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: AÇÕES QUE REALIZAMOS -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">O que fazemos</div>
+        <h2 class="q-h serif">Ações que <span class="gold">realizamos</span></h2>
+        <div style="margin-top:20px;">
+          <div class="proc-item">
+            <div class="proc-num">1</div>
+            <div><h3>Poupamos o seu tempo</h3><p>Para gerenciar todos os seus pontos.</p></div>
+          </div>
+          <div class="proc-item">
+            <div class="proc-num">2</div>
+            <div><h3>Evitamos que você cometa erros</h3><p>Na sua gestão de viagens.</p></div>
+          </div>
+          <div class="proc-item">
+            <div class="proc-num">3</div>
+            <div><h3>Economia e Lucratividade</h3><p>Na utilização de seus pontos.</p></div>
+          </div>
+          <div class="proc-item">
+            <div class="proc-num">4</div>
+            <div><h3>Entregamos Eficiência</h3><p>Na compra de suas passagens.</p></div>
+          </div>
+          <div class="proc-item">
+            <div class="proc-num">5</div>
+            <div><h3>Proporcionamos Conforto e Qualidade</h3><p>Em suas viagens.</p></div>
+          </div>
+        </div>
+        <button class="btn-cta" onclick="goTo(6)">Ver casos reais →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: CASOS REAIS -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Auxílios extras · Casos reais</div>
+        <h2 class="q-h serif">O que dá pra fazer com <span class="gold">milhas bem geridas</span></h2>
+        <p class="sub">Exemplos reais aplicados no dia a dia dos nossos clientes</p>
+
+        <div class="caso-card">
+          <div class="caso-top">
+            <div class="caso-icon">🏨</div>
+            <div><h3>Hospedagem na Europa</h3><span>1 semana · R$20.000</span></div>
+          </div>
+          <div class="caso-stats-row">
+            <div><b>88 mil</b><span>milhas geradas</span></div>
+            <div><b>14x</b><span>o mesmo trecho aéreo</span></div>
+            <div><b>Só taxa</b><span>de embarque</span></div>
+          </div>
+          <div class="caso-quote">"O valor de uma hospedagem pode se transformar em 14 viagens aéreas pagando praticamente nada."</div>
+        </div>
+
+        <div class="caso-card">
+          <div class="caso-top">
+            <div class="caso-icon">✈️</div>
+            <div><h3>Classe Executiva — Buenos Aires</h3><span>GRU → EZE</span></div>
+          </div>
+          <div class="caso-stats-row">
+            <div><b>R$6.150</b><span>preço à vista</span></div>
+            <div><b>R$1.284</b><span>em milhas com a gente</span></div>
+            <div><b>R$4.936</b><span>de economia</span></div>
+          </div>
+          <div class="caso-quote">"Esse é o poder de acumular e investir em milhas de forma inteligente — e esse trabalho é todo nosso."</div>
+        </div>
+
+        <button class="btn-cta" onclick="goTo(7)">Ver o que será verificado →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 8: SERÁ VERIFICADO -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Diagnóstico gratuito</div>
+        <h2 class="q-h serif">O que <span class="gold">será verificado</span></h2>
+        <div class="check-list">
+          <div class="check-row"><span class="mark">✓</span>Envio do formulário</div>
+          <div class="check-row"><span class="mark">✓</span>Você terá uma projeção</div>
+          <div class="check-row"><span class="mark">✓</span>Quais cartões você possui</div>
+          <div class="check-row"><span class="mark">✓</span>Possibilidades de upgrade dos seus cartões</div>
+          <div class="check-row"><span class="mark">✓</span>Quais benefícios de cartões você possui e como utilizá-los</div>
+          <div class="check-row"><span class="mark">✓</span>Quais programas de pontos e milhas você possui cadastro</div>
+          <div class="check-row"><span class="mark">✓</span>Qual o seu status nas cias aéreas</div>
+          <div class="check-row"><span class="mark">✓</span>Qual o seu perfil de viajante e suas preferências</div>
+        </div>
+        <p class="sub" style="margin-top:14px;">Diante disso podemos traçar onde podemos chegar, e também, quantas milhas podemos acumular.</p>
+        <div class="alert-box">⚡ Se hoje você não faz isso, você está <b>PERDENDO DINHEIRO!</b></div>
+        <button class="btn-cta" onclick="goTo(8)">Ver como funciona a transparência →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 9: TRANSPARÊNCIA -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Transparência</div>
+        <h2 class="q-h serif">Sem letras <span class="gold">miúdas</span></h2>
+        <div class="calc-card">
+          <p style="font-size:14px; color:#dbe3f7; line-height:1.7;">Mensalmente, ou quando você solicitar, será enviado a você o extrato de seus programas de pontos e milhas, bem como tudo o que foi gasto e acumulado neste período.</p>
+        </div>
+        <div class="alert-box" style="margin-top:16px;">⚠️ Vale ressaltar que <b>nenhum pagamento</b> será realizado sem a sua confirmação.</div>
+        <button class="btn-cta" onclick="goTo(9)">Ver os planos disponíveis →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 10: PLANOS -->
+    <div class="screen">
+      <div class="screen-inner top-align">
+        <div class="eyebrow">Planos disponíveis</div>
+        <h2 class="q-h serif">Programa de Gestão de Milhas</h2>
+
+        <div class="plano-card" data-plano="Gold" data-preco="490">
+          <div class="plano-head"><div class="name">Gold</div><div class="plano-price">12x R$490</div></div>
+          <p class="plano-desc">Consultoria de cartões + emissões em milhas</p>
+          <div class="plano-feats">
+            <div>Consultoria de Cartões</div>
+            <div>Emissões em Milhas para o Titular</div>
+            <div>Administração das Viagens</div>
+            <div>Descontos em Passagens</div>
+            <div>Auxílio em reservas de Hotéis</div>
+          </div>
+        </div>
+
+        <div class="plano-card pop" data-plano="Platinum" data-preco="790">
+          <div class="plano-head"><div class="name">Platinum <span class="tag-pop">↑ Popular</span></div><div class="plano-price">12x R$790</div></div>
+          <p class="plano-desc">Gestão completa + benefícios em executiva</p>
+          <div class="plano-feats">
+            <div>Tudo do Gold, mais:</div>
+            <div>Busca em Passagens em Classe Executiva</div>
+            <div>Emissão para Familiares</div>
+            <div>Auxílio em Compra de Produtos</div>
+            <div>Seguro Viagem, Chip e Aluguel de Carro</div>
+          </div>
+        </div>
+
+        <div class="plano-card" data-plano="Black" data-preco="1190">
+          <div class="plano-head"><div class="name">Black</div><div class="plano-price">12x R$1.190</div></div>
+          <p class="plano-desc">Full service + gestão de milhas do CNPJ</p>
+          <div class="plano-feats">
+            <div>Tudo do Platinum, mais:</div>
+            <div>Gestão de Milhas do CNPJ</div>
+            <div>Gestão Black para Sócio/Cônjuge</div>
+            <div>Consultoria Completa Viagem dos Sonhos</div>
+            <div>Gestão Estatística de Viagens</div>
+          </div>
+        </div>
+
+        <button class="btn-cta" onclick="goTo(10)">Quero minha análise gratuita →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 11: GARANTIA -->
+    <div class="screen">
+      <div class="screen-inner">
+        <div class="eyebrow" style="text-align:center;">Nosso compromisso</div>
+        <h2 class="q-h serif" style="text-align:center;">Promessa é <span class="gold">dívida</span></h2>
+        <div class="calc-card" style="margin-top:22px;">
+          <p style="font-size:14.5px; color:#dbe3f7; line-height:1.7;">Se dentro de <b style="color:var(--gold);">12 meses</b> você realizar as metas traçadas no seu plano de gestão de milhas e não obter o retorno do seu dinheiro investido de volta, você terá o <b style="color:var(--gold);">reembolso total</b> pago em suas parcelas.</p>
+        </div>
+        <p class="lead" style="margin-top:18px;">O nosso comprometimento é mostrar a você o quão simples é gerir as suas milhas.</p>
+        <button class="btn-cta" onclick="goTo(11)">Quero essa garantia →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 12: CTA FINAL -->
+    <div class="screen">
+      <div class="screen-inner">
+        <div class="plane">✈️</div>
+        <h1 class="hero-h serif">Pronto para <span class="gold">voar sem pagar?</span></h1>
+        <p class="lead">Fale agora com nosso especialista. A análise do seu perfil é <b style="color:#fff;">100% gratuita</b> e sem compromisso.</p>
+        <a class="btn-whatsapp" id="waBtn" href="#" target="_blank">💬 Falar no WhatsApp agora</a>
+        <button class="btn-ghost-full" onclick="goTo(1)">← Recalcular meu diagnóstico</button>
+        <div class="lock-note">🔒 Seus dados ficam 100% seguros conosco</div>
+        <div class="footer-note">Parceiro oficial<div class="partner">🌐 comprarviagem.com.br/ceuazul</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const totalScreens = 12;
+  let current = 0;
+  const state = { gasto: 20000, viagens: 2, plano: 'Platinum' };
+
+  function render(){
+    document.getElementById('screens').style.transform = `translateX(-${current*100}%)`;
+    document.getElementById('progressFill').style.width = ((current+1)/totalScreens*100) + '%';
+    document.getElementById('stepTag').textContent = `Passo ${current+1} de ${totalScreens}`;
+  }
+  function goTo(i){ current = i; render(); }
+
+  const gastoSlider = document.getElementById('gastoSlider');
+  function updateGasto(){
+    const v = Number(gastoSlider.value);
+    document.getElementById('gastoInline').textContent = 'R$ ' + v.toLocaleString('pt-BR');
+    document.getElementById('gastoBig').childNodes[0].textContent = 'R$ ' + v.toLocaleString('pt-BR');
+    state.gasto = v;
+  }
+  gastoSlider.addEventListener('input', updateGasto);
+
+  document.querySelectorAll('#opts-viagens .opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#opts-viagens .opt-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.viagens = Number(btn.dataset.val);
+    });
+  });
+
+  document.querySelectorAll('.plano-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.plano-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.plano = card.dataset.plano;
+      updateWhatsapp();
+    });
+  });
+
+  function calcular(){
+    const milhasPorReal = 1.0; // meio-termo entre o sistema antigo (1,5) e o baseado em dólar (~0,58)
+
+    const milhasMes = Math.round(state.gasto * milhasPorReal);
+    const milhasAno = milhasMes * 12;
+    const perdaAno = Math.round((milhasAno/1000) * 30);
+    const custoGold = 490 * 12; // 5.880/ano
+    const economiaLiquida = Math.max(perdaAno - custoGold, 0);
+    const roi = custoGold > 0 ? (perdaAno / custoGold) : 0;
+
+    document.getElementById('resPerda').textContent = 'R$ ' + perdaAno.toLocaleString('pt-BR');
+    document.getElementById('resMes').textContent = milhasMes.toLocaleString('pt-BR');
+    document.getElementById('resAno').textContent = milhasAno.toLocaleString('pt-BR');
+    document.getElementById('resEconomia').textContent = 'R$ ' + economiaLiquida.toLocaleString('pt-BR');
+    document.getElementById('resRoi').textContent = roi.toFixed(1) + 'x';
+
+    goTo(2);
+  }
+
+  function updateWhatsapp(){
+    const msg = `Olá! Fiz o diagnóstico gratuito no site da Céu Azul: gasto R$${state.gasto.toLocaleString('pt-BR')}/mês, ${state.viagens} viagens/ano, e tenho interesse no plano ${state.plano}. Quero saber mais!`;
+    document.getElementById('waBtn').href = 'https://wa.me/5511953740990?text=' + encodeURIComponent(msg);
+  }
+
+  updateGasto();
+  updateWhatsapp();
+  render();
+</script>
+
+</body>
+</html>
