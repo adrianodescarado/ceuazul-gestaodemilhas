@@ -52,6 +52,20 @@
 
   /* SCREENS */
   .viewport{position:relative; z-index:2; height:calc(100vh - 44px); height:calc(100dvh - 44px); overflow:hidden;}
+
+  .scroll-hint{
+    position:fixed; left:50%; bottom:calc(10px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%);
+    display:none; align-items:center; gap:6px; z-index:30;
+    background:rgba(10,13,26,0.9); border:1px solid rgba(109,147,239,0.5); color:var(--blue-light);
+    font-size:11.5px; font-weight:600; padding:7px 14px; border-radius:20px;
+    backdrop-filter:blur(6px); pointer-events:none; animation:hintbounce 1.4s ease-in-out infinite;
+  }
+  @keyframes hintbounce{0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,4px);}}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%,60%{transform:translateX(-6px);}
+    40%,80%{transform:translateX(6px);}
+  }
   .screens{display:flex; height:100%; width:100%; transition:transform .5s cubic-bezier(.65,0,.35,1);}
   .screen{
     flex:0 0 100%; max-width:100%; height:100%; overflow-y:auto;
@@ -61,23 +75,23 @@
   .screen-inner.top-align{padding-top:6px;}
 
   /* LOGO / HERO */
-  .logo-row{display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:26px;}
+  .logo-row{display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:16px;}
   .logo-icon{
-    width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
-    display:flex; align-items:center; justify-content:center; font-size:23px;
+    width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
+    display:flex; align-items:center; justify-content:center; font-size:20px;
   }
-  .logo-text{font-size:24px; font-weight:800;}
+  .logo-text{font-size:21px; font-weight:800;}
   .logo-text .azul{color:var(--blue-light);}
 
   .badge{
-    display:block; margin:0 auto 30px; width:fit-content;
+    display:block; margin:0 auto 18px; width:fit-content;
     border:1px solid rgba(109,147,239,0.4); color:var(--blue-text);
-    font-size:14.5px; font-weight:600; padding:10px 20px; border-radius:24px;
+    font-size:13px; font-weight:600; padding:8px 16px; border-radius:24px;
     background:rgba(59,111,224,0.08);
   }
 
   .plane{
-    font-size:88px; text-align:center; margin-bottom:22px;
+    font-size:64px; text-align:center; margin-bottom:14px;
     animation:pulse 2.2s ease-in-out infinite;
   }
   @keyframes pulse{
@@ -86,11 +100,11 @@
   }
 
   h1.hero-h{
-    font-size:clamp(36px,10vw,52px); font-weight:900; text-align:center; line-height:1.15;
-    margin-bottom:20px; letter-spacing:-0.01em;
+    font-size:clamp(28px,8vw,44px); font-weight:900; text-align:center; line-height:1.14;
+    margin-bottom:14px; letter-spacing:-0.01em;
   }
   h1.hero-h .gold{color:var(--gold);}
-  p.lead{color:var(--muted); font-size:17px; text-align:center; margin-bottom:28px; line-height:1.65;}
+  p.lead{color:var(--muted); font-size:15.5px; text-align:center; margin-bottom:20px; line-height:1.55;}
 
   .btn-cta{
     display:block; width:100%; text-align:center; background:linear-gradient(135deg,var(--blue-light),var(--blue-deep));
@@ -99,7 +113,7 @@
   }
   .btn-cta:active{transform:scale(0.98);}
 
-  .stats-row{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:32px;}
+  .stats-row{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px;}
   .stat{text-align:center;}
   .stat b{display:block; font-family:'Playfair Display',serif; font-size:27px; color:var(--gold); font-weight:800;}
   .stat span{font-size:11.5px; color:var(--muted); line-height:1.3; display:block; margin-top:3px;}
@@ -118,13 +132,13 @@
   .big-num span{color:var(--gold); font-size:16px; font-weight:600; margin-left:6px;}
   .big-num-row{display:flex; align-items:baseline; gap:6px; margin-bottom:14px;}
   .big-num-row .cur{font-family:'Playfair Display',serif; font-size:26px; font-weight:800; color:var(--white);}
-  .big-num-row input[type=number]{
-    font-family:'Playfair Display',serif; font-size:34px; font-weight:800; color:var(--white);
+  .big-num-row input#gastoInput{
+    font-family:'Playfair Display',serif; font-size:38px; font-weight:800; color:var(--white);
     background:transparent; border:none; border-bottom:2px solid var(--blue-light); outline:none;
-    width:9ch; -moz-appearance:textfield;
+    width:8ch; padding:0 0 4px; -moz-appearance:textfield; caret-color:var(--blue-light);
   }
-  .big-num-row input[type=number]::-webkit-outer-spin-button,
-  .big-num-row input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
+  .big-num-row input#gastoInput::-webkit-outer-spin-button,
+  .big-num-row input#gastoInput::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
   .big-num-row .unit{color:var(--gold); font-size:16px; font-weight:600;}
   .slider-hint{font-size:11px; color:var(--muted); margin-top:10px;}
   input[type=range]{
@@ -261,6 +275,8 @@
   <div class="topbar-row"><div class="step-tag" id="stepTag">Passo 1 de 6</div></div>
 </div>
 
+<div class="scroll-hint" id="scrollHint">⌄ role para continuar</div>
+
 <div class="viewport">
   <div class="screens" id="screens">
 
@@ -274,7 +290,7 @@
         <span class="badge">✦ Exclusivo para viajantes frequentes</span>
         <div class="plane">✈️</div>
         <h1 class="hero-h serif">Você está deixando <span class="gold">dinheiro no ar</span></h1>
-        <p class="lead">Quem gasta R$20k+ no cartão todo mês poderia estar viajando de graça. Descubra quanto você está perdendo agora.</p>
+        <p class="lead">Quem gasta R$20k+ no cartão todo mês poderia viajar de graça. Descubra quanto você está perdendo agora.</p>
         <button class="btn-cta" onclick="goTo(1)">Calcular minha perda — grátis →</button>
         <div class="stats-row">
           <div class="stat"><b>+200</b><span>clientes ativos</span></div>
@@ -295,7 +311,7 @@
           <div class="slider-label">Gasto mensal no cartão:</div>
           <div class="big-num-row">
             <span class="cur">R$</span>
-            <input type="number" id="gastoInput" min="1000" step="500" value="20000">
+            <input type="text" inputmode="numeric" id="gastoInput" value="20.000">
             <span class="unit">/ mês</span>
           </div>
           <input type="range" id="gastoSlider" min="1000" max="100000" step="500" value="20000">
@@ -528,8 +544,8 @@
           </div>
         </div>
 
-        <p class="sub" id="planoHint" style="margin-top:12px; text-align:center;">👆 Escolha um plano para continuar</p>
-        <button class="btn-cta" id="btnPlano" disabled onclick="goTo(10)">Quero minha análise gratuita →</button>
+        <p class="sub" id="planoHint" style="margin-top:12px; text-align:center; color:var(--gold-light);">👆 Escolha uma opção acima e clique em "Quero minha análise gratuita"</p>
+        <button class="btn-cta" id="btnPlano" onclick="continuarPlanos()">Quero minha análise gratuita →</button>
       </div>
     </div>
 
@@ -572,8 +588,23 @@
     document.getElementById('screens').style.transform = `translateX(-${current*100}%)`;
     document.getElementById('progressFill').style.width = ((current+1)/totalScreens*100) + '%';
     document.getElementById('stepTag').textContent = `Passo ${current+1} de ${totalScreens}`;
+    setTimeout(updateScrollHint, 60);
   }
   function goTo(i){ current = i; render(); }
+
+  function getActiveScreenEl(){
+    return document.querySelectorAll('.screen')[current];
+  }
+  function updateScrollHint(){
+    const el = getActiveScreenEl();
+    const hint = document.getElementById('scrollHint');
+    if(!el || !hint) return;
+    const needsScroll = el.scrollHeight - el.clientHeight > 30;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 24;
+    hint.style.display = (needsScroll && !atBottom) ? 'flex' : 'none';
+  }
+  document.querySelectorAll('.screen').forEach(s => s.addEventListener('scroll', updateScrollHint));
+  window.addEventListener('resize', updateScrollHint);
 
   const gastoSlider = document.getElementById('gastoSlider');
   const gastoInput = document.getElementById('gastoInput');
@@ -581,11 +612,32 @@
   function setGasto(v){
     v = Math.max(1000, Math.round(Number(v) || 0));
     state.gasto = v;
-    gastoInput.value = v;
+    gastoInput.value = v.toLocaleString('pt-BR');
     gastoSlider.value = Math.min(v, Number(gastoSlider.max));
   }
-  gastoSlider.addEventListener('input', ()=> setGasto(gastoSlider.value));
-  gastoInput.addEventListener('input', ()=> setGasto(gastoInput.value));
+
+  gastoInput.addEventListener('focus', ()=> gastoInput.select());
+
+  // Slider: arrasta e já formata
+  gastoSlider.addEventListener('input', ()=>{
+    state.gasto = Number(gastoSlider.value);
+    gastoInput.value = state.gasto.toLocaleString('pt-BR');
+  });
+
+  // Campo digitado: permite apagar tudo livremente, só formata a cada tecla
+  gastoInput.addEventListener('input', ()=>{
+    const digits = gastoInput.value.replace(/\D/g, '');
+    if(digits === ''){ gastoInput.value = ''; state.gasto = 0; return; }
+    const num = parseInt(digits, 10);
+    state.gasto = num;
+    gastoInput.value = num.toLocaleString('pt-BR');
+    gastoSlider.value = Math.min(num, Number(gastoSlider.max));
+  });
+
+  // Só valida o mínimo quando o campo perde o foco (não durante a digitação)
+  gastoInput.addEventListener('blur', ()=>{
+    if(!state.gasto || state.gasto < 1000) setGasto(1000);
+  });
 
   document.querySelectorAll('#opts-viagens .opt-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -600,12 +652,24 @@
       document.querySelectorAll('.plano-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
       state.plano = card.dataset.plano;
-      document.getElementById('btnPlano').disabled = false;
       document.getElementById('planoHint').style.display = 'none';
       atualizarEconomia(); // reflete no passo 3 caso o cliente volte
       updateWhatsapp();
     });
   });
+
+  function continuarPlanos(){
+    if(!state.plano){
+      alert('Por favor, escolha um plano (Gold, Platinum ou Black) antes de continuar 🙂');
+      document.querySelectorAll('.plano-card').forEach(c=>{
+        c.style.animation = 'none';
+        void c.offsetWidth; // reinicia a animação
+        c.style.animation = 'shake 0.4s ease';
+      });
+      return;
+    }
+    goTo(10);
+  }
 
   function atualizarEconomia(){
     const planoBase = state.plano || 'Gold';
